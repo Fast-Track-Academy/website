@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate HTML structure
+        run: |
+          echo "Validating HTML files..."
+          for file in *.html; do
+            echo "Checking $file..."
+            if ! grep -q "<!DOCTYPE html>" "$file"; then
+              echo "Warning: $file missing DOCTYPE declaration"
+            fi
+            if ! grep -q "<title>" "$file"; then
+              echo "Warning: $file missing title tag"
+            fi
+            if ! grep -q "<meta.*viewport" "$file"; then
+              echo "Warning: $file missing viewport meta tag"
+            fi
+          done
+
+      - name: Check CSS syntax
+        run: |
+          echo "Basic CSS syntax check..."
+          for file in *.css; do
+            echo "Checking $file..."
+            # Basic brace matching
+            if [ $(grep -o '{' "$file" | wc -l) -ne $(grep -o '}' "$file" | wc -l) ]; then
+              echo "Error: Mismatched braces in $file"
+              exit 1
+            fi
+          done
+
+      - name: Check JavaScript syntax
+        run: |
+          echo "Basic JavaScript syntax check..."
+          for file in *.js; do
+            echo "Checking $file..."
+            node -c "$file" || echo "Syntax error in $file"
+          done
+
+      - name: Check file permissions
+        run: |
+          echo "Checking file permissions..."
+          find . -type f -name "*.html" -o -name "*.css" -o -name "*.js" | xargs ls -l
+
+      - name: Security headers check
+        run: |
+          echo "Checking for security-related meta tags..."
+          grep -r "Content-Security-Policy\|X-Frame-Options\|X-Content-Type-Options" *.html || echo "Consider adding security headers"

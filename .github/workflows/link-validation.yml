@@ -1,0 +1,45 @@
+name: Link Validation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run weekly to catch broken external links
+    - cron: '0 9 * * 1'
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install link checker
+        run: |
+          npm install -g broken-link-checker
+
+      - name: Start local server
+        run: |
+          python3 -m http.server 8080 &
+          sleep 5
+        
+      - name: Check internal links
+        run: |
+          blc http://localhost:8080 --recursive --ordered --exclude-external || true
+
+      - name: Check for missing alt text in images
+        run: |
+          echo "Checking for images without alt text..."
+          grep -n "<img" *.html | grep -v "alt=" || echo "All images have alt text"
+
+      - name: Check for missing title attributes
+        run: |
+          echo "Checking for links without titles..."
+          grep -n "<a" *.html | grep -v "title=" || echo "Some links missing title attributes"

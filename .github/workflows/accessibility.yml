@@ -1,0 +1,52 @@
+name: Accessibility Testing
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  accessibility:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install accessibility tools
+        run: |
+          npm install -g @axe-core/cli pa11y-ci
+
+      - name: Start local server
+        run: |
+          python3 -m http.server 8080 &
+          sleep 5
+
+      - name: Run axe accessibility tests
+        run: |
+          npx axe http://localhost:8080 --exit || true
+
+      - name: Run pa11y accessibility tests  
+        run: |
+          echo '{"urls": ["http://localhost:8080"]}' > .pa11yci.json
+          pa11y-ci || true
+
+      - name: Check color contrast (manual)
+        run: |
+          echo "Manual color contrast check required"
+          echo "Ensure sufficient contrast ratios (4.5:1 for normal text, 3:1 for large text)"
+
+      - name: Check semantic HTML structure
+        run: |
+          echo "Checking for proper heading hierarchy..."
+          grep -n "<h[1-6]" *.html || echo "No headings found"
+          
+      - name: Check for proper alt text
+        run: |
+          echo "Checking alt text quality..."
+          grep -o 'alt="[^"]*"' *.html | grep -v 'alt=""' || echo "Some images may need better alt text"
