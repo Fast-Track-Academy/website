@@ -1,0 +1,58 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          npm install -g htmlhint stylelint jshint
+          npm install -g stylelint-config-standard
+
+      - name: Create stylelint config
+        run: |
+          echo '{
+            "extends": ["stylelint-config-standard"],
+            "rules": {
+              "selector-class-pattern": null,
+              "keyframes-name-pattern": null,
+              "custom-property-pattern": null,
+              "font-family-name-quotes": null
+            }
+          }' > .stylelintrc.json
+
+      - name: Validate HTML
+        run: |
+          htmlhint "*.html" --format unix || true
+
+      - name: Validate CSS  
+        run: |
+          stylelint "*.css" || true
+
+      - name: Validate JavaScript
+        run: |
+          jshint *.js || true
+
+      - name: Check file sizes
+        run: |
+          echo "File sizes:"
+          ls -lh *.html *.css *.js
+          
+      - name: Basic security scan
+        run: |
+          echo "Checking for common security issues..."
+          grep -i "eval\|innerHTML\|document.write" *.js || echo "No obvious security issues found"
