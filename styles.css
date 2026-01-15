@@ -578,6 +578,75 @@ h3 {
     flex-wrap: wrap;
 }
 
+/* Faculty */
+.faculty-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.faculty-card {
+    background: rgba(0, 255, 136, 0.1);
+    border: 2px solid #00ff88;
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.faculty-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 255, 136, 0.4);
+    background: rgba(0, 255, 136, 0.2);
+}
+
+.faculty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+}
+
+.faculty-card h3 {
+    color: #00ff88;
+    margin-bottom: 10px;
+}
+
+.faculty-title {
+    color: #ffff00;
+    font-weight: bold;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.faculty-bio {
+    color: #aaaaff;
+    margin-bottom: 20px;
+    line-height: 1.4;
+    font-size: 0.95rem;
+}
+
+.faculty-specialties {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.faculty-specialties span {
+    background: rgba(0, 204, 255, 0.2);
+    border: 1px solid #00ccff;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    color: #00ccff;
+}
+
+.screen-subtitle {
+    font-size: 1rem;
+    color: #aaaaff;
+    margin-bottom: 30px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .game-hud {
@@ -622,6 +691,10 @@ h3 {
     }
     
     .ai-tools-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .faculty-grid {
         grid-template-columns: 1fr;
     }
     
